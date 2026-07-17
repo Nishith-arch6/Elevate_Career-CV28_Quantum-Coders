@@ -405,26 +405,7 @@ const [chatMessages, setChatMessages] = useState([
                 </button>
               </div>
             </div>
-            <div className="hero-visual">
-              <div className="floating-cards">
-                <div className="card card-1">
-                  <i className="fab fa-react"></i>
-                  <span>React</span>
-                </div>
-                <div className="card card-2">
-                  <i className="fab fa-node-js"></i>
-                  <span>Node.js</span>
-                </div>
-                <div className="card card-3">
-                  <i className="fab fa-python"></i>
-                  <span>Python</span>
-                </div>
-                <div className="card card-4">
-                  <i className="fas fa-database"></i>
-                  <span>Database</span>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
       </section>
