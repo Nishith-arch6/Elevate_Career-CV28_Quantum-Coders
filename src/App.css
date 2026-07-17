@@ -1923,6 +1923,16 @@ section {
   color: var(--primary-700);
 }
 
+.auth-error {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
 /* Footer - Professional */
 .footer {
   background: var(--gray-900);

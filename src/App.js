@@ -123,32 +123,72 @@ function App() {
     }
   };
 
+  const [loginError, setLoginError] = useState('');
+  const [signupError, setSignupError] = useState('');
+
+  const getRegisteredUsers = () => {
+    try {
+      return JSON.parse(localStorage.getItem('registeredUsers')) || [];
+    } catch {
+      return [];
+    }
+  };
+
   const handleLogin = (e) => {
     e.preventDefault();
+    setLoginError('');
     const formData = new FormData(e.target);
     const email = formData.get('email');
     const password = formData.get('password');
-    
-    // Simple mock authentication
-    if (email && password) {
-      setUser({ email, name: email.split('@')[0] });
-      setIsLoggedIn(true);
-      setShowLogin(false);
+
+    if (!email || !password) {
+      setLoginError('Please fill in all fields.');
+      return;
     }
+
+    const users = getRegisteredUsers();
+    const found = users.find(u => u.email === email && u.password === password);
+
+    if (!found) {
+      setLoginError('No account found. Please sign up first.');
+      return;
+    }
+
+    setUser({ email, name: email.split('@')[0] });
+    setIsLoggedIn(true);
+    setShowLogin(false);
   };
 
   const handleSignup = (e) => {
     e.preventDefault();
+    setSignupError('');
     const formData = new FormData(e.target);
     const email = formData.get('email');
     const password = formData.get('password');
     const confirm = formData.get('confirm');
-    
-    if (email && password && password === confirm) {
-      setUser({ email, name: email.split('@')[0] });
-      setIsLoggedIn(true);
-      setShowSignup(false);
+
+    if (!email || !password || !confirm) {
+      setSignupError('Please fill in all fields.');
+      return;
     }
+
+    if (password !== confirm) {
+      setSignupError('Passwords do not match.');
+      return;
+    }
+
+    const users = getRegisteredUsers();
+    if (users.find(u => u.email === email)) {
+      setSignupError('Account already exists. Please log in.');
+      return;
+    }
+
+    users.push({ email, password });
+    localStorage.setItem('registeredUsers', JSON.stringify(users));
+
+    setUser({ email, name: email.split('@')[0] });
+    setIsLoggedIn(true);
+    setShowSignup(false);
   };
 
   const handleLogout = () => {
@@ -368,10 +408,10 @@ const [chatMessages, setChatMessages] = useState([
               </div>
             ) : (
               <div className="auth-buttons">
-                <button onClick={() => setShowLogin(true)} className="btn btn-outline btn-sm">
+                <button onClick={() => { setShowLogin(true); setShowSignup(false); setLoginError(''); }} className="btn btn-outline btn-sm">
                   <i className="fas fa-sign-in-alt"></i> Login
                 </button>
-                <button onClick={() => setShowSignup(true)} className="btn btn-primary btn-sm">
+                <button onClick={() => { setShowSignup(true); setShowLogin(false); setSignupError(''); }} className="btn btn-primary btn-sm">
                   <i className="fas fa-user-plus"></i> Sign Up
                 </button>
               </div>
@@ -961,6 +1001,7 @@ const [chatMessages, setChatMessages] = useState([
             </div>
             <form onSubmit={handleLogin}>
               <div className="form-section">
+                {loginError && <p className="auth-error">{loginError}</p>}
                 <input
                   type="email"
                   name="email"
@@ -984,7 +1025,7 @@ const [chatMessages, setChatMessages] = useState([
             <p className="text-center">
               Don't have an account? 
               <button 
-                onClick={() => { setShowLogin(false); setShowSignup(true); }}
+                onClick={() => { setShowLogin(false); setShowSignup(true); setSignupError(''); }}
                 className="link-button"
               >
                 Sign Up
@@ -1006,6 +1047,7 @@ const [chatMessages, setChatMessages] = useState([
             </div>
             <form onSubmit={handleSignup}>
               <div className="form-section">
+                {signupError && <p className="auth-error">{signupError}</p>}
                 <input
                   type="email"
                   name="email"
@@ -1036,7 +1078,7 @@ const [chatMessages, setChatMessages] = useState([
             <p className="text-center">
               Already have an account? 
               <button 
-                onClick={() => { setShowSignup(false); setShowLogin(true); }}
+                onClick={() => { setShowSignup(false); setShowLogin(true); setLoginError(''); }}
                 className="link-button"
               >
                 Login
